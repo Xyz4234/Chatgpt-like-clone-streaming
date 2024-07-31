@@ -1,8 +1,8 @@
 import streamlit as st
-from openai import OpenAI
 import openai
 
-client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+# Initialize OpenAI client
+openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 st.title("Streaming Chat-GPT-like Clone 👽")
 
@@ -39,9 +39,8 @@ if prompt := st.chat_input("What is up?"):
     with st.chat_message("assistant"):
         response = ""
         message_placeholder = st.empty()
-        full_response = ""
         try:
-            stream = client.chat_completions.create(
+            stream = openai.ChatCompletion.create(
                 model=st.session_state["openai_model"],
                 messages=[
                     {"role": m["role"], "content": m["content"]}
@@ -52,9 +51,9 @@ if prompt := st.chat_input("What is up?"):
             for chunk in stream:
                 if 'choices' in chunk and len(chunk['choices']) > 0:
                     delta_content = chunk['choices'][0].get('delta', {}).get('content', '')
-                    full_response += delta_content
-                    message_placeholder.markdown(full_response)
+                    response += delta_content
+                    message_placeholder.markdown(response)
         except Exception as e:
             st.error(f"An error occurred: {e}")
 
-    st.session_state.messages.append({"role": "assistant", "content": full_response})
+    st.session_state.messages.append({"role": "assistant", "content": response})

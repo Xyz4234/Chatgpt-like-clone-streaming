@@ -1,6 +1,7 @@
 import streamlit as st
 from openai import OpenAI
 
+# Initialize OpenAI client
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 st.title("Streaming Chat-GPT-Like Clone 😘")
@@ -17,22 +18,25 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-# CSS to style the input prompt
+# CSS to style the input prompt and placeholder
 st.markdown("""
     <style>
     .prompt-box {
         position: relative;
+        width: 100%;
     }
     .prompt-placeholder {
         position: absolute;
-        top: 0;
+        top: -25px;  /* Adjust this value to position above the input field */
         left: 0;
+        right: 0;
         padding: 10px;
         color: white;
         background: linear-gradient(45deg, red, purple);
         border-radius: 5px;
-        z-index: 1;
+        text-align: center;
         transition: opacity 0.2s ease-out;
+        z-index: 1;
     }
     .prompt-box input:focus + .prompt-placeholder,
     .prompt-box input:not(:placeholder-shown) + .prompt-placeholder {
@@ -66,5 +70,18 @@ if prompt:
             ],
             stream=True,
         )
-        response = st.write_stream(stream)
-    st.session_state.messages.append({"role": "assistant", "content": response})
+        response = ""
+        for chunk in stream:
+            response += chunk['choices'][0]['delta'].get('content', "")
+            st.markdown(response)
+        st.session_state.messages.append({"role": "assistant", "content": response})
+
+# Ensure the prompt-placeholder disappears after the conversation starts
+if st.session_state.messages:
+    st.markdown("""
+        <style>
+        .prompt-placeholder {
+            opacity: 0 !important;
+        }
+        </style>
+    """, unsafe_allow_html=True)

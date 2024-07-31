@@ -4,7 +4,7 @@ import streamlit as st
 
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
-st.title("Streaming Chat-gpt-like-clone💬")
+st.title("Streaming Chat-gpt-like-clone😘")
 
 
 
@@ -18,7 +18,7 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-if prompt := st.chat_input("What is up?"):
+if prompt := st.chat_input("Wassup write smth here"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)

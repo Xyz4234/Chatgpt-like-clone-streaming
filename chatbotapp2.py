@@ -36,17 +36,22 @@ if prompt := st.chat_input("What is up?"):
         st.markdown(prompt)
 
     with st.chat_message("assistant"):
-        stream = client.chat.completions.create(
-            model=st.session_state["openai_model"],
-            messages=[
-                {"role": m["role"], "content": m["content"]}
-                for m in st.session_state.messages
-            ],
-            stream=True,
-        )
-        response = ""
-        for chunk in stream:
-            response += chunk['choices'][0]['delta'].get('content', '')
-            st.markdown(response)
+        try:
+            stream = client.chat.completions.create(
+                model=st.session_state["openai_model"],
+                messages=[
+                    {"role": m["role"], "content": m["content"]}
+                    for m in st.session_state.messages
+                ],
+                stream=True,
+            )
+            response = ""
+            for chunk in stream:
+                if 'choices' in chunk and len(chunk['choices']) > 0:
+                    delta_content = chunk['choices'][0].get('delta', {}).get('content', '')
+                    response += delta_content
+                    st.markdown(response)
+        except Exception as e:
+            st.error(f"An error occurred: {e}")
 
     st.session_state.messages.append({"role": "assistant", "content": response})

@@ -1,9 +1,8 @@
 from openai import OpenAI
 import streamlit as st
-import os
 
 
-OpenAI.api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 st.title("Streaming Chat-gpt-like-clone💬")
 

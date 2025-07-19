@@ -1,13 +1,10 @@
 from openai import OpenAI
 import streamlit as st
 
-
-
-client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+# ✅ Correct access to secret key
+client = OpenAI(api_key=st.secrets["openai"]["api_key"])
 
 st.title("Streaming Chat-GPT-like Clone 😉🔭💬")
-
-
 
 if "openai_model" not in st.session_state:
     st.session_state["openai_model"] = "gpt-3.5-turbo"
@@ -34,4 +31,5 @@ if prompt := st.chat_input("Wassup write smth here"):
             stream=True,
         )
         response = st.write_stream(stream)
+
     st.session_state.messages.append({"role": "assistant", "content": response})
